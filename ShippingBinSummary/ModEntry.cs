@@ -14,25 +14,17 @@ namespace ShippingBinSummary
 {
     class ModEntry : Mod
     {
-        private bool isCJBSellItemPriceLoaded;
-
         private DataModel Data = null!;
         private readonly Rectangle CoinSourceRect = new(5, 69, 6, 6);
 
-        private bool showGui = false;
+        private bool showToolTip = false;
     
         string allItemsSellPriceString;
         int allItemsSellPrice;
 
         public override void Entry(IModHelper helper)
         {
-            this.Monitor.Log("Loading ShippingBinSummaryMod...");
-            isCJBSellItemPriceLoaded = this.Helper.ModRegistry.IsLoaded("CJBok.ShowItemSellPrice");
-            if(!isCJBSellItemPriceLoaded)
-            {
-                this.Monitor.Log("CJBSellItemPrice mod not found! ShippingBinSummaryMod can't work without it!");
-                return;
-            }
+            this.Monitor.Log("Loading Shipping Bin Summary Mod...");
 
             this.Data = helper.Data.ReadJsonFile<DataModel>("assets/data.json") ?? new DataModel(null);
 
@@ -46,15 +38,20 @@ namespace ShippingBinSummary
                 return;
 
             Building shippingBin = Game1.getFarm().buildings.Where(obj => obj.buildingType == "Shipping Bin").FirstOrDefault();
-            
             List<Vector2> shippingBinTiles = new List<Vector2>();
+
             if (shippingBin != null)
             {
-                shippingBinTiles.Add(new Vector2(shippingBin.tileX, shippingBin.tileY));
-                shippingBinTiles.Add(new Vector2(shippingBin.tileX, shippingBin.tileY-1));
-                shippingBinTiles.Add(new Vector2(shippingBin.tileX+1, shippingBin.tileY));
-                shippingBinTiles.Add(new Vector2(shippingBin.tileX+1, shippingBin.tileY-1));
+                int width = shippingBin.tilesWide;
+                int height = shippingBin.tilesHigh + 1;
+                for( int x = 0; x < width; x++ )
+                {
+                    for( int y = 0; y < height; y++ ) {
+                        shippingBinTiles.Add(new Vector2(shippingBin.tileX + x, shippingBin.tileY - y));
+                    }
+                }
             }
+
             Vector2 mouseTile = e.NewPosition.Tile;
             if (mouseTile != null)
             {
@@ -69,24 +66,24 @@ namespace ShippingBinSummary
                     if (allItemsSellPrice > 0)
                     {
                         allItemsSellPriceString = allItemsSellPrice.ToString();
-                        showGui = true;
+                        showToolTip = true;
                     } else
                     {
                         allItemsSellPriceString = "Empty";
-                        showGui = true;
+                        showToolTip = true;
                     }
                 } else
                 {
-                    showGui = false;
+                    showToolTip = false;
                 }
             } else
             {
-                showGui = false;
+                showToolTip = false;
             }
         }
         private void OnPostRenderHudEvent(object sender, RenderedHudEventArgs e)
         {
-            if(showGui)
+            if(showToolTip)
             {
                 Vector2 stringLength = Game1.smallFont.MeasureString(allItemsSellPriceString);
                 bool isEmpty = allItemsSellPriceString == "Empty";
