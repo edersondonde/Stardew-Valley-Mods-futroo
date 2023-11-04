@@ -1,0 +1,11 @@
+# Ignore bin and obj directories
+
+**/bin/
+**/obj/
+**/.vs/
+**/Properties/
+**/packages/
+
+
+# Ignore .sln files
+**/*.sln
