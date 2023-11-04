@@ -2,9 +2,9 @@
   "Name": "ShippingBinSummary",
   "Author": "Futro",
   "Version": "1.0.0",
-  "Description": "Pokazuje łączną cenę wszystkich rzeczy w skrzynce sprzedaży.",
+  "Description": "Shows a tooltip with the total price of items in Shipping Bin when you hover your mouse over it.",
   "UniqueID": "futro.ShippingBinSummary",
   "EntryDll": "ShippingBinSummary.dll",
   "MinimumApiVersion": "3.0.0",
-  "UpdateKeys": []
+  "UpdateKeys": [ "Nexus:18992" ]
 }
