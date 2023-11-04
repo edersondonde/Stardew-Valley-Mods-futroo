@@ -14,7 +14,7 @@ Supports all items that can be sold through the shipping bin.
 ## Installation
 Install SMAPI: Ensure you have [SMAPI](https://smapi.io/ "SMAPI") (Stardew Modding API) installed on your computer.
 
-Download the Mod: Download the latest version of the Shipping Bin Summary Mod from the Releases page or from [Nexus Mods](https://www.nexusmods.com/stardewvalley/mods/18992 "Nexus Mods")
+Download the Mod: Download the latest version of the Shipping Bin Summary Mod from the [Releases Page](https://github.com/futroo/Stardew-Valley-Mods/releases/tag/ShippingBinSummary "Releases Page") or from [Nexus Mods](https://www.nexusmods.com/stardewvalley/mods/18992 "Nexus Mods")
 
 Install the Mod:
 
