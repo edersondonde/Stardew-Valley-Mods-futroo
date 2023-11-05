@@ -6,6 +6,8 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Menus;
+using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SObject = StardewValley.Object;
@@ -15,8 +17,6 @@ namespace ShippingBinSummary
     class ModEntry : Mod
     {
         private DataModel Data = null!;
-        private readonly Rectangle CoinSourceRect = new(5, 69, 6, 6);
-
         private bool showToolTip = false;
     
         string allItemsSellPriceString;
@@ -24,7 +24,7 @@ namespace ShippingBinSummary
 
         public override void Entry(IModHelper helper)
         {
-            this.Monitor.Log("Loading Shipping Bin Summary Mod...");
+            this.Monitor.Log("Loading Shipping Bin Summary Mod...", LogLevel.Info);
 
             this.Data = helper.Data.ReadJsonFile<DataModel>("assets/data.json") ?? new DataModel(null);
 
@@ -83,25 +83,38 @@ namespace ShippingBinSummary
         }
         private void OnPostRenderHudEvent(object sender, RenderedHudEventArgs e)
         {
-            if(showToolTip)
+            if (showToolTip)
             {
-                Vector2 stringLength = Game1.smallFont.MeasureString(allItemsSellPriceString);
-                bool isEmpty = allItemsSellPriceString == "Empty";
+                const int border = 8;
+                const int padding = 6;
+                Rectangle CoinSource = new(5, 69, 6, 6);
 
-                int width = isEmpty ? (int)stringLength.X + Game1.tileSize / 2 : (int)stringLength.X + Game1.tileSize / 2 + 30;
-                int height = (int)stringLength.Y + Game1.tileSize / 3 + 5;
+                int coinSize = CoinSource.Width * Game1.pixelZoom;
 
-                int x = (int)(Mouse.GetState().X) - width/2 + 15;
-                int y = (int)(Mouse.GetState().Y) + Game1.tileSize / 2 + 10;
+                Vector2 priceTextSize = Game1.smallFont.MeasureString(allItemsSellPriceString);
+                
+                Vector2 innerSize = new(priceTextSize.X + (allItemsSellPriceString != "Empty" ? padding + coinSize : 0), priceTextSize.Y);
+                Vector2 outerSize = innerSize + new Vector2((border + padding) * 2);
 
-                IClickableMenu.drawTextureBox(Game1.spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White);
-                Utility.drawTextWithShadow(Game1.spriteBatch, allItemsSellPriceString, Game1.smallFont, new Vector2(x + Game1.tileSize / 4, y + Game1.tileSize / 4), Game1.textColor);
-                if(!isEmpty)
+                float x = Game1.getMouseX() - innerSize.X/2;
+                float y = Game1.getMouseY() + 46;
+
+                if ((int)x + (int)outerSize.X > Game1.uiViewport.Width)
+                    x = Game1.uiViewport.Width - (int)outerSize.X;
+                if ((int)y + (int)outerSize.Y > Game1.uiViewport.Height)
+                    y = Game1.uiViewport.Height - (int)outerSize.Y;
+
+                IClickableMenu.drawTextureBox(Game1.spriteBatch, Game1.menuTexture, new Rectangle(0, 256, 60, 60), (int)x, (int)y, (int)outerSize.X + (allItemsSellPriceString == "Empty" ? 0 : 3), (int)outerSize.Y, Color.White);
+                Utility.drawTextWithShadow(Game1.spriteBatch, allItemsSellPriceString, Game1.smallFont, new Vector2(x + border + padding, y + border + padding + 2), Game1.textColor);
+
+                if (allItemsSellPriceString != "Empty")
                 {
-                    Game1.spriteBatch.Draw(Game1.debrisSpriteSheet, new Vector2(x + width - 38, y + 18), this.CoinSourceRect, Color.White, 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 1f);
+                    Game1.spriteBatch.Draw(Game1.debrisSpriteSheet, new Vector2(x + outerSize.X - border - padding - coinSize, y + border + padding + 5), CoinSource, Color.White, 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 1f);
                 }
+                
             }
         }
+    
         private int? GetSellPrice(Item item)
         {
             if (!CanBeSold(item, this.Data.ForceSellable))
