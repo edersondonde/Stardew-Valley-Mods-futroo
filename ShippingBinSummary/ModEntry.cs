@@ -24,8 +24,6 @@ namespace ShippingBinSummary
 
         public override void Entry(IModHelper helper)
         {
-            this.Monitor.Log("Loading Shipping Bin Summary Mod...", LogLevel.Info);
-
             this.Data = helper.Data.ReadJsonFile<DataModel>("assets/data.json") ?? new DataModel(null);
 
             helper.Events.Input.CursorMoved += OnCursorMoved;
